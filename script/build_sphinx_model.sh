@@ -7,7 +7,7 @@
 #                  language, like "en"
 #   * HMM_PATH - points to the directory holding the HMM model files
 #   * DIC_FILE - points to the dictionary file (.dic)
-#   * DMP_FILE - points to the grammar file (.DMP)
+#   * DMP_FILE - points to the statistical language model file (.DMP)
 
 set -o errexit  # Stop the script on the first error.
 set -o nounset  # Catch un-initialized variables.
@@ -16,7 +16,7 @@ set -o nounset  # Catch un-initialized variables.
 : ${MODEL_NAME:="digits"}
 : ${HMM_PATH:="third_party/pocketsphinx/model/hmm/en/tidigits"}
 : ${DIC_FILE:="third_party/pocketsphinx/model/lm/en/tidigits.dic"}
-: ${DMP_FILE:="third_party/pocketsphinx/model/lm/en/tidigits.dMP"}
+: ${DMP_FILE:="third_party/pocketsphinx/model/lm/en/tidigits.DMP"}
 
 # Point the build system to our packaged fastcomp and emscripten.
 export LLVM="$PWD/build/fastcomp/build/bin"
@@ -39,19 +39,8 @@ cd "$OLD_PWD"
 cd "build/sphinx_models/$MODEL_NAME"
 python "$EMSCRIPTEN/tools/file_packager.py" \
     "$SPHINX/build/pocketsphinx.js" \
-    --embed "models/$MODEL_NAME.dic" \
-    "--js-output=js/lm_dic_file.js"
-python "$EMSCRIPTEN/tools/file_packager.py" \
-    "$SPHINX/build/pocketsphinx.js" \
-    --embed "models/$MODEL_NAME.DMP" \
-    "--js-output=js/lm_dmp_file.js"
-for FILE in $(ls "models/$MODEL_NAME"); do
-  python "$EMSCRIPTEN/tools/file_packager.py" \
-      "$SPHINX/build/pocketsphinx.js" \
-      --embed "models/$MODEL_NAME/$FILE" \
-      "--js-output=js/$FILE.js"
-done
-cat js/*.js > "$MODEL_NAME.js"
+    --embed models/**/* models/* \
+    "--js-output=$MODEL_NAME.js"
 cd ../../..
 
 mkdir -p lib/sphinx/models

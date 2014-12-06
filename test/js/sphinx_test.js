@@ -167,10 +167,148 @@
     });
     return describe('Recognizer', function() {
       beforeEach(function() {
-        return this.recognizer = new this.sphinx.Recognizer();
+        this.config = new this.sphinx.Config();
+        this.config.push_back(['-hmm', 'models/digits']);
+        this.config.push_back(['-dict', 'models/digits.dic']);
+        this.config.push_back(['-lm', 'models/digits.DMP']);
+        return this.recognizer = new this.sphinx.Recognizer(this.config);
       });
-      return afterEach(function() {
-        return this.recognizer["delete"]();
+      afterEach(function() {
+        this.recognizer["delete"]();
+        return this.config["delete"]();
+      });
+      describe('#addWords', function() {
+        beforeEach(function() {
+          this.words = new this.sphinx.VectorWords();
+          this.words.push_back(['ZER', 'Z_zero II_zero R_zero']);
+          this.words.push_back(['SEV', 'S_seven EH_seven V_seven']);
+          return this.status = this.recognizer.addWords(this.words);
+        });
+        afterEach(function() {
+          return this.words["delete"]();
+        });
+        return it('succeeds with good data', function() {
+          return expect(this.status).to.equal(this.sphinx.ReturnType.SUCCESS);
+        });
+      });
+      describe('#addGrammar', function() {
+        beforeEach(function() {
+          this.transitions = new this.sphinx.VectorTransitions();
+          this.transitions.push_back({
+            from: 0,
+            to: 1,
+            logp: 0,
+            word: 'ZERO'
+          });
+          this.transitions.push_back({
+            from: 1,
+            to: 2,
+            logp: 0,
+            word: 'SEVEN'
+          });
+          this.transitions.push_back({
+            from: 1,
+            to: 2,
+            logp: 0,
+            word: ''
+          });
+          this.ids = new this.sphinx.Integers();
+          return this.status = this.recognizer.addGrammar(this.ids, {
+            start: 1,
+            end: 2,
+            numStates: 3,
+            transitions: this.transitions
+          });
+        });
+        afterEach(function() {
+          this.transitions["delete"]();
+          return this.ids["delete"]();
+        });
+        it('succeeds with good data', function() {
+          return expect(this.status).to.equal(this.sphinx.ReturnType.SUCCESS);
+        });
+        return it('populates the ids input vector', function() {
+          return expect(this.ids.size()).to.equal(1);
+        });
+      });
+      describe('#addKeyword', function() {
+        beforeEach(function() {
+          this.ids = new this.sphinx.Integers();
+          return this.status = this.recognizer.addKeyword(this.ids, 'ZERO ZERO SEVEN');
+        });
+        afterEach(function() {
+          return this.ids["delete"]();
+        });
+        it('succeeds with good data', function() {
+          return expect(this.status).to.equal(this.sphinx.ReturnType.SUCCESS);
+        });
+        return it('populates the ids input vector', function() {
+          return expect(this.ids.size()).to.equal(1);
+        });
+      });
+      describe('#switchSearch', function() {
+        beforeEach(function() {
+          var ids, transitions;
+          ids = new this.sphinx.Integers();
+          this.recognizer.addKeyword(ids, 'ZERO ZERO SEVEN');
+          this.keywordId = ids.get(0);
+          ids["delete"]();
+          transitions = new this.sphinx.VectorTransitions();
+          transitions.push_back({
+            from: 0,
+            to: 1,
+            logp: 0,
+            word: 'ZERO'
+          });
+          transitions.push_back({
+            from: 1,
+            to: 2,
+            logp: 0,
+            word: 'SEVEN'
+          });
+          transitions.push_back({
+            from: 1,
+            to: 2,
+            logp: 0,
+            word: ''
+          });
+          ids = new this.sphinx.Integers();
+          this.recognizer.addGrammar(ids, {
+            start: 1,
+            end: 2,
+            numStates: 3,
+            transitions: transitions
+          });
+          this.grammarId = ids.get(0);
+          ids["delete"]();
+          return transitions["delete"]();
+        });
+        it('works with a grammar', function() {
+          return expect(this.recognizer.switchSearch(this.grammarId)).to.equal(this.sphinx.ReturnType.SUCCESS);
+        });
+        return it('works with a keyword', function() {
+          return expect(this.recognizer.switchSearch(this.keywordId)).to.equal(this.sphinx.ReturnType.SUCCESS);
+        });
+      });
+      return describe('#start / #process / #stop', function() {
+        beforeEach(function() {
+          var i, _i, _results;
+          this.silence = new this.sphinx.AudioBuffer();
+          _results = [];
+          for (i = _i = 0; _i < 1024; i = ++_i) {
+            _results.push(this.silence.push_back(0));
+          }
+          return _results;
+        });
+        afterEach(function() {
+          return this.silence["delete"]();
+        });
+        return it('works on silence', function() {
+          expect(this.recognizer.start()).to.equal(this.sphinx.ReturnType.SUCCESS);
+          expect(this.recognizer.process(this.silence)).to.equal(this.sphinx.ReturnType.SUCCESS);
+          expect(this.recognizer.getHyp()).to.equal('');
+          return expect(this.recognizer.stop()).to.equal(this.sphinx.ReturnType.SUCCESS);
+        });
       });
     });
   });

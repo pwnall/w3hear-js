@@ -28,6 +28,9 @@ cd build/sphinx/build
 cmake .. \
     -DEMSCRIPTEN=1 \
     -DHMM_EMBED=OFF \
+    -DHMM_BASE=models \
+    -DLM_BASE=models \
+    -DDICT_BASE=models \
     -DCMAKE_TOOLCHAIN_FILE="$EMSCRIPTEN/cmake/Modules/Platform/Emscripten.cmake"
 make -j4
 cd ../../..

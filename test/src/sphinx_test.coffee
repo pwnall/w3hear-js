@@ -145,9 +145,102 @@ describe 'lib/sphinx/pocketsphinx.js', ->
 
       expect(@vector.get(1)).to.equal undefined
 
-
   describe 'Recognizer', ->
     beforeEach ->
-      @recognizer = new @sphinx.Recognizer()
+      @config = new @sphinx.Config()
+      @config.push_back ['-hmm', 'models/digits']
+      @config.push_back ['-dict', 'models/digits.dic']
+      @config.push_back ['-lm', 'models/digits.DMP']
+      @recognizer = new @sphinx.Recognizer @config
     afterEach ->
       @recognizer.delete()
+      @config.delete()
+
+    describe '#addWords', ->
+      beforeEach ->
+        @words = new @sphinx.VectorWords()
+        @words.push_back ['ZER', 'Z_zero II_zero R_zero']
+        @words.push_back ['SEV', 'S_seven EH_seven V_seven']
+        @status = @recognizer.addWords @words
+      afterEach ->
+        @words.delete()
+
+      it 'succeeds with good data', ->
+        expect(@status).to.equal @sphinx.ReturnType.SUCCESS
+
+    describe '#addGrammar', ->
+      beforeEach ->
+        @transitions = new @sphinx.VectorTransitions()
+        @transitions.push_back from: 0, to: 1, logp: 0, word: 'ZERO'
+        @transitions.push_back from: 1, to: 2, logp: 0, word: 'SEVEN'
+        @transitions.push_back from: 1, to: 2, logp: 0, word: ''
+
+        @ids = new @sphinx.Integers()
+        @status = @recognizer.addGrammar @ids,
+            start: 1, end: 2, numStates: 3, transitions: @transitions
+
+      afterEach ->
+        @transitions.delete()
+        @ids.delete()
+
+      it 'succeeds with good data', ->
+        expect(@status).to.equal @sphinx.ReturnType.SUCCESS
+
+      it 'populates the ids input vector', ->
+        expect(@ids.size()).to.equal 1
+
+    describe '#addKeyword', ->
+      beforeEach ->
+        @ids = new @sphinx.Integers()
+        @status = @recognizer.addKeyword @ids, 'ZERO ZERO SEVEN'
+
+      afterEach ->
+        @ids.delete()
+
+      it 'succeeds with good data', ->
+        expect(@status).to.equal @sphinx.ReturnType.SUCCESS
+
+      it 'populates the ids input vector', ->
+        expect(@ids.size()).to.equal 1
+
+    describe '#switchSearch', ->
+      beforeEach ->
+        ids = new @sphinx.Integers()
+        @recognizer.addKeyword ids, 'ZERO ZERO SEVEN'
+        @keywordId = ids.get 0
+        ids.delete()
+
+        transitions = new @sphinx.VectorTransitions()
+        transitions.push_back from: 0, to: 1, logp: 0, word: 'ZERO'
+        transitions.push_back from: 1, to: 2, logp: 0, word: 'SEVEN'
+        transitions.push_back from: 1, to: 2, logp: 0, word: ''
+        ids = new @sphinx.Integers()
+        @recognizer.addGrammar ids,
+            start: 1, end: 2, numStates: 3, transitions: transitions
+        @grammarId = ids.get 0
+        ids.delete()
+        transitions.delete()
+
+      it 'works with a grammar', ->
+        expect(@recognizer.switchSearch(@grammarId)).to.equal(
+            @sphinx.ReturnType.SUCCESS)
+
+      it 'works with a keyword', ->
+        expect(@recognizer.switchSearch(@keywordId)).to.equal(
+            @sphinx.ReturnType.SUCCESS)
+
+    describe '#start / #process / #stop', ->
+      beforeEach ->
+        @silence = new @sphinx.AudioBuffer()
+        for i in [0...1024]
+          @silence.push_back 0
+      afterEach ->
+        @silence.delete()
+
+      it 'works on silence', ->
+        expect(@recognizer.start()).to.equal @sphinx.ReturnType.SUCCESS
+        expect(@recognizer.process(@silence)).to.equal(
+            @sphinx.ReturnType.SUCCESS)
+        expect(@recognizer.getHyp()).to.equal ''
+        expect(@recognizer.stop()).to.equal @sphinx.ReturnType.SUCCESS
+
