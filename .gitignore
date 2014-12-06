@@ -4,4 +4,12 @@
 # OSX.
 .DS_Store
 
+# Npm modules.
+/node_modules
 
+# Node output.
+npm-debug.log
+
+# Build output.
+build/
+lib/pocketsphinx.js

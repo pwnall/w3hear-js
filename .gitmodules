@@ -1,0 +1,24 @@
+[submodule "third_party/pocketsphinx"]
+	path = third_party/pocketsphinx
+	url = git@github.com:cmusphinx/pocketsphinx.git
+[submodule "third_party/pocketsphinx.js"]
+	path = third_party/pocketsphinx.js
+	url = git@github.com:syl22-00/pocketsphinx.js.git
+[submodule "third_party/emscripten"]
+	path = third_party/emscripten
+	url = git@github.com:kripken/emscripten.git
+[submodule "third_party/emscripten-fastcomp"]
+	path = third_party/emscripten-fastcomp
+	url = git@github.com:kripken/emscripten-fastcomp.git
+[submodule "third_party/emscripten-fastcomp-clang"]
+	path = third_party/emscripten-fastcomp-clang
+	url = git@github.com:kripken/emscripten-fastcomp-clang.git
+[submodule "third_party/cmudict"]
+	path = third_party/cmudict
+	url = git@github.com:cmusphinx/cmudict.git
+[submodule "third_party/sphinxbase"]
+	path = third_party/sphinxbase
+	url = git@github.com:cmusphinx/sphinxbase.git
+[submodule "third_party/sphinxtrain"]
+	path = third_party/sphinxtrain
+	url = git@github.com:cmusphinx/sphinxtrain.git
