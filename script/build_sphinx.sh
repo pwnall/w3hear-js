@@ -8,7 +8,13 @@ set -o nounset  # Catch un-initialized variables.
 rm -rf build/sphinx
 mkdir -p build
 
+# Point the build system to our packaged fastcomp and emscripten.
+export LLVM="$PWD/build/fastcomp/build/bin"
+export EMSCRIPTEN="$PWD/third_party/emscripten"
+
 # Set up the pocketsphinx.js build tree and inject our Sphinx version.
+#    https://github.com/syl22-00/pocketsphinx.js#2a-compilation-with-the-default-acoustic-model
+#    https://github.com/syl22-00/pocketsphinx.js#ii-package-model-files-outside-the-main-javascript
 cp -r third_party/pocketsphinx.js build/
 mv build/pocketsphinx.js build/sphinx
 rm -rf build/sphinx/sphinxbase
@@ -16,10 +22,6 @@ cp -r third_party/sphinxbase build/sphinx/
 rm -rf build/sphinx/pocketsphinx
 cp -r third_party/pocketsphinx build/sphinx/
 mkdir -p build/sphinx/build
-
-# Point the build system to our packaged fastcomp and emscripten.
-export LLVM="$PWD/build/fastcomp/build/bin"
-export EMSCRIPTEN="$PWD/third_party/emscripten"
 
 # Build pocketsphinx with Emscripten.
 cd build/sphinx/build
@@ -31,5 +33,5 @@ make -j4
 cd ../../..
 
 export SPHINX="$PWD/build/sphinx/build"
-mkdir -p dist
-cp "$SPHINX/pocketsphinx.js" lib/
+mkdir -p lib/sphinx
+cp "$SPHINX/pocketsphinx.js" lib/sphinx/

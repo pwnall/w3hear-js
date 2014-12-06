@@ -1,0 +1,50 @@
+{
+  "name": "w3hear",
+  "version": "0.1.0",
+  "description": "W3hear JS speech commands recognition",
+  "keywords": ["speech", "commands", "w3ear"],
+  "homepage": "https://github.com/pwnall/w3hear-js",
+  "author": "Victor Costan <victor@costan.us> (http://www.costan.us)",
+  "license": "MIT",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pwnall/w3hear.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pwnall/w3hear/issues"
+  },
+  "engines": {
+    "node": ">= 0.10.33"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "async": ">= 0.9.0",
+    "chai": ">= 1.10.0",
+    "body-parser": ">= 1.9.2",
+    "codo": ">= 2.0.9",
+    "coffee-script": ">= 1.8.0",
+    "cors": ">= 2.5.2",
+    "express": ">= 4.10.2",
+    "fs-extra": ">= 0.12.0",
+    "glob": ">= 4.0.6",
+    "mocha": ">= 2.0.1",
+    "open": ">= 0.0.5",
+    "sinon": ">= 1.11.1",
+    "sinon-chai": ">= 2.3.1",
+    "source-map-support": ">= 0",
+    "uglify-js": ">= 2.4.15",
+    "watch": ">= 0.13.0"
+  },
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "src": "src",
+    "test": "test"
+  },
+  "scripts": {
+    "prepublish": "node node_modules/coffee-script/bin/cake build",
+    "test": "node node_modules/coffee-script/bin/cake test"
+  }
+}

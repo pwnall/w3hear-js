@@ -12,4 +12,4 @@ npm-debug.log
 
 # Build output.
 build/
-lib/pocketsphinx.js
+lib/sphinx/
