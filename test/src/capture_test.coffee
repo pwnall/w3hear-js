@@ -1,6 +1,6 @@
 Capture = W3hear._.Capture
 
-describe.only 'Capture', ->
+describe 'Capture', ->
   beforeEach ->
     @capture = new Capture inputBufferSize: 4096
 

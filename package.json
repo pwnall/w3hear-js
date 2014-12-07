@@ -36,8 +36,7 @@
     "source-map-support": ">= 0",
     "uglify-js": ">= 2.4.15",
     "watch": ">= 0.13.0",
-    "web-audio-api": "git+https://github.com/sebpiq/node-web-audio-api.git#master",
-    "webworker-threads": ">= 0.5.3"
+    "web-audio-api": "git+https://github.com/sebpiq/node-web-audio-api.git#master"
 
   },
   "main": "lib/index.js",

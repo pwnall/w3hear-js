@@ -1,16 +1,15 @@
 # This is a node.js-only test that verifies that pocketsphinx.js presents the
 # interface that we expect.
 
-fs = require 'fs'
+# HACK: skip all the tests in the browser.
+if testSphinxLoader is null
+  describe = -> null
+else
+  describe = W3hear._.global.describe
 
 describe 'lib/sphinx/pocketsphinx.js', ->
   before ->
-    # Massive hack for loading the asm.js code.
-    sphinxJs = fs.readFileSync 'lib/sphinx/pocketsphinx.js', encoding: 'utf8'
-    digitsJs = fs.readFileSync 'lib/sphinx/models/digits.js', encoding: 'utf8'
-    Module = null
-    eval(sphinxJs + ";\n" + digitsJs)
-    @sphinx = Module
+    @sphinx = testSphinxLoader._module
 
   it 'defines the right APIs', ->
     # The API list is extracted from the pocketsphinx.js README.

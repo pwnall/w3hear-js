@@ -18,5 +18,8 @@ build/
 lib/w3hear.js
 lib/w3hear.min.js
 lib/w3hear.min.map
+lib/w3hear_worker.js
+lib/w3hear_worker.min.js
+lib/w3hear_worker.min.map
 lib/sphinx/
 test/js/

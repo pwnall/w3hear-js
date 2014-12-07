@@ -6,21 +6,22 @@ path = require 'path'
 run = require './run.coffee'
 
 build = (callback) ->
-  buildCode ->
-    buildTests ->
-      callback() if callback
+  buildCode 'main', 'w3hear.js', ->
+    buildCode 'worker', 'w3hear_worker.js', ->
+      buildTests ->
+        callback() if callback
 
-buildCode = (callback) ->
+buildCode = (sourceDir, outName, callback) ->
   # Ignoring ".coffee" when sorting.
   # We want "auth_driver.coffee" to sort before "auth_driver/browser.coffee"
-  source_files = glob.sync 'src/**/*.coffee'
-  source_files.sort (a, b) ->
+  sourceFiles = glob.sync "src/#{sourceDir}/**/*.coffee"
+  sourceFiles.sort (a, b) ->
     a.replace(/\.coffee$/, '').localeCompare b.replace(/\.coffee$/, '')
 
   # TODO(pwnall): add --map after --compile when CoffeeScript #2779 is fixed
   #               and the .map file isn't useless
   command = 'node node_modules/coffee-script/bin/coffee --output lib ' +
-      "--compile --join w3hear.js #{source_files.join(' ')}"
+      "--compile --join #{outName} #{sourceFiles.join(' ')}"
 
   run command, noExit: true, noOutput: true, (exitCode) ->
     if exitCode is 0
@@ -32,7 +33,7 @@ buildCode = (callback) ->
     fs.mkdirSync 'tmp' unless fs.existsSync 'tmp'
     commands = []
     commands.push 'node node_modules/coffee-script/bin/coffee ' +
-        '--output tmp --compile ' + source_files.join(' ')
+        '--output tmp --compile ' + sourceFiles.join(' ')
     async.forEachSeries commands, run, ->
       # run should exit on its own. This is mostly for clarity.
       process.exit 1
@@ -56,6 +57,9 @@ buildPackage = (callback) ->
   commands.push 'cd lib && node ../node_modules/uglify-js/bin/uglifyjs ' +
       '--compress --mangle --output w3hear.min.js ' +
       '--source-map w3hear.min.map w3hear.js'
+  commands.push 'cd lib && node ../node_modules/uglify-js/bin/uglifyjs ' +
+      '--compress --mangle --output w3hear_worker.min.js ' +
+      '--source-map w3hear_worker.min.map w3hear_worker.js'
   async.forEachSeries commands, run, ->
     callback() if callback
 

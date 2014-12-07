@@ -18,7 +18,7 @@ reading... more text. W3Ear shakes up the programming experience by letting you
 run your code via voice commands. By taking advantage of the current state of
 Web audio technologies, we hope to make coding a more rewarding experience.
 
-## Prerequisites
+## Development Prerequisites
 
 [enscripten](https://github.com/kripken/emscripten) requires
 [CMake](http://www.cmake.org/),
@@ -39,7 +39,7 @@ brew install python
 # Install nvm and use it to install node.js.
 ```
 
-## Setup
+## Development Setup
 
 ```bash
 git clone
@@ -51,7 +51,21 @@ npm install
 ./script/build_sphinx.sh
 ```
 
+A NPM package that we depend on uses the gulp ES6 transpiler, so it needs its
+development dependencies and pre-packaging build step.
+
 ```bash
 cd node_modules/web-audio-api
 npm install
+```
+
+## Running tests
+
+The following commands run the node.js tests, the browser tests in your default
+browser, and the browser tests in Firefox.
+
+```bash
+cake test
+cake webtest
+BROWSER=firefox cake webtest
 ```

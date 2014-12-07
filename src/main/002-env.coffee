@@ -8,7 +8,10 @@ if typeof global isnt 'undefined' and typeof module isnt 'undefined' and
 
   # Polyfills for Web APIs.
   W3hear._.AudioContext = require('web-audio-api').AudioContext
-  W3hear._.Worker = require('webworker-threads').Worker
+
+  # TODO(pwnall): restore the node.js Worker tests if the polyfill becomes more
+  #               stable
+  W3hear._.Worker = null  # require('webworker-threads').Worker
 
 
 else if typeof window isnt 'undefined' and typeof navigator isnt 'undefined'
