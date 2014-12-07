@@ -20,15 +20,24 @@ Web audio technologies, we hope to make coding a more rewarding experience.
 
 ## Anatomy of the W3Ear
 
-Speech recognition requires several layers of processing. In the context of 
-web applications, the sound is first captured by the browser, then passed on to 
-a Speech Recognition Engine (SRE) for interpretation.
+The user's voice is first captured in the browser (__w3hear.js__). Speech
+recognition is then handed off to a background thread (__w3hear_worker.js__)
+that loads a Speech Recognition Engine. The engine contains a decoder and
+various reference files. The references define all the sound units (phonemes)
+that the engine will be expected to recognize, as well as the probabilistic
+models (Hidden Markov Models) describing the likelihoods of phoneme combinations
+(basically, valid words). The decoder refers to these models to determine the
+word or phrase that most closely matches the input audio stream.
 
 ### w3hear.js
 
 This file uses `getUserMedia()` from the WebRTC API and the
 [Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
 to obtain permission to use the user's microphone.
+
+### w3hear_worker.js
+
+WHO AM I? WHAT YEAR IS THIS?
 
 ## Prerequisites
 
