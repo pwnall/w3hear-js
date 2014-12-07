@@ -10,6 +10,7 @@ clean = require './tasks/clean'
 run = require './tasks/run'
 test = require './tasks/test'
 vendor = require './tasks/vendor'
+weblive = require './tasks/weblive'
 
 task 'build', ->
   clean ->
@@ -31,6 +32,11 @@ task 'webtest', ->
   build ->
     vendor ->
       test.web()
+
+task 'weblive', ->
+  build ->
+    build.package ->
+      weblive.web()
 
 task 'vendor', ->
   fs.removeSync 'test/vendor' if fs.existsSync 'test/vendor'

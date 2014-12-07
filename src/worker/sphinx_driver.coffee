@@ -25,9 +25,9 @@ class W3hearWorker.SphinxDriver extends W3hearWorker.Driver
   # @return undefined
   _buildConfig: (options) ->
     @_config = new @_module.Config
-    @_config.push_back ['hmm', "models/#{options.model}"]
-    @_config.push_back ['dict', "models/#{options.model}.dic"]
-    @_config.push_back ['lm', "models/#{options.model}.DMP"]
+    @_config.push_back ['-hmm', options.model]
+    @_config.push_back ['-dict', "#{options.model}.dic"]
+    @_config.push_back ['-lm', "#{options.model}.DMP"]
     return
 
   # Builds the global Recognizer object for pocketsphinx.
@@ -50,6 +50,10 @@ class W3hearWorker.SphinxDriver extends W3hearWorker.Driver
 
   # @see {W3hearWorker.Driver#_process}
   _process: (samples) ->
+    if Math.random() * 100 < 2
+      aa = (samples[0][i] for i in [0...16])
+      console.log aa
+
     if @_buffer isnt null
       # Reuse existing buffer if possible, to reduce GC pressure.
       if samples[0].length is @_buffer.size()

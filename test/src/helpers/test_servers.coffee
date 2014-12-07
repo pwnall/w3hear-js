@@ -21,6 +21,11 @@ class TestServers
     return null unless @_address
     "http://localhost:#{@_address.port}/test/html/browser_test.html"
 
+  # The URL that should be used to start the live demo.
+  liveUrl: ->
+    return null unless @_address
+    "http://localhost:#{@_address.port}/test/html/browser_live.html"
+
   # Starts listening to the test servers' sockets.
   #
   # @param {function()} callback called when the servers are ready to accept

@@ -7,7 +7,7 @@ if testSphinxLoader is null
 else
   describe = W3hear._.global.describe
 
-describe 'lib/sphinx/pocketsphinx.js', ->
+describe.only 'lib/sphinx/pocketsphinx.js', ->
   before ->
     @sphinx = testSphinxLoader._module
 
@@ -147,9 +147,9 @@ describe 'lib/sphinx/pocketsphinx.js', ->
   describe 'Recognizer', ->
     beforeEach ->
       @config = new @sphinx.Config()
-      @config.push_back ['-hmm', 'models/digits']
-      @config.push_back ['-dict', 'models/digits.dic']
-      @config.push_back ['-lm', 'models/digits.DMP']
+      @config.push_back ['-hmm', 'digits']
+      @config.push_back ['-dict', 'digits.dic']
+      @config.push_back ['-lm', 'digits.DMP']
       @recognizer = new @sphinx.Recognizer @config
     afterEach ->
       @recognizer.delete()

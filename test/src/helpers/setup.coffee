@@ -10,7 +10,11 @@ if global? and require? and module? and (not cordova?)
   exports.sinon = require 'sinon'
   exports.sinonChai = require 'sinon-chai'
 
-  exports.testSphinxLoader = new exports.W3hearWorker.Loader null, null
+  controller = {
+    onPrint: console.log
+    onPrintError: console.error
+  }
+  exports.testSphinxLoader = new exports.W3hearWorker.Loader null, controller
   exports.testSphinxLoader.loadEngine(
       engine: 'sphinx', debug: false, model: 'digits')
   exports.testXhrServer = ''

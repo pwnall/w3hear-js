@@ -36,12 +36,12 @@ cd "$OLD_PWD"
 
 
 # Build JS files.
-cd "build/sphinx_models/$MODEL_NAME"
+cd "build/sphinx_models/$MODEL_NAME/models"
 python "$EMSCRIPTEN/tools/file_packager.py" \
     "$SPHINX/build/pocketsphinx.js" \
-    --embed models/**/* models/* \
-    "--js-output=$MODEL_NAME.js"
-cd ../../..
+    --embed **/* * \
+    "--js-output=../$MODEL_NAME.js"
+cd ../../../..
 
 mkdir -p lib/sphinx/models
 cp "build/sphinx_models/$MODEL_NAME/$MODEL_NAME.js" lib/sphinx/models/

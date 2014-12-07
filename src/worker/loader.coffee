@@ -25,8 +25,8 @@ class W3hearWorker.Loader
 
     @_prepareModule options if @_module is null
     driverClass = @_driverClass options.engine
-    @_loadFiles [driverClass.engineFile,
-                 driverClass.modelDataFile(options.model)]
+    @_loadFiles [driverClass.modelDataFile(options.model),
+                 driverClass.engineFile]
     @_driver = new driverClass(@_module, options)
     @_driver
 
