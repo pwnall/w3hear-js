@@ -1,7 +1,7 @@
 window.addEventListener 'load', ->
   transcriptElement = document.querySelector '#transcript'
   window.recognizer = new W3hear(
-      engine: 'sphinx', engineDebug: true, modelData: 'digits',
+      engine: 'sphinx', engineDebug: true, modelData: 'en',
       workerPath: window.location.origin + '/lib',
       workerFile: 'w3hear_worker.min.js')
   recognizer.onresult = (event) ->

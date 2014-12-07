@@ -42,23 +42,23 @@ class W3hearWorker.SphinxDriver extends W3hearWorker.Driver
 
   # @see {W3hearWorker.Driver#_start}
   _start: ->
-    @_recognizer.start()
+    status = @_recognizer.start()
+    if status isnt @_module.ReturnType.SUCCESS
+      @_module['PrintErr']('Recognizer.start() returned non-success status')
 
   # @see {W3hearWorker.Driver#_stop}
   _stop: ->
-    @_recognizer.stop()
+    status = @_recognizer.stop()
+    if status isnt @_module.ReturnType.SUCCESS
+      @_module['PrintErr']('Recognizer.stop() returned non-success status')
 
   # @see {W3hearWorker.Driver#_process}
   _process: (samples) ->
-    if Math.random() * 100 < 2
-      aa = (samples[0][i] for i in [0...16])
-      console.log aa
-
     if @_buffer isnt null
       # Reuse existing buffer if possible, to reduce GC pressure.
       if samples[0].length is @_buffer.size()
         for i in [0...samples[0].length]
-          @_buffer.set i, samples[0][i]
+          @_buffer.set i, (samples[0][i] + samples[1][i]) * 16383
       else
         @_buffer.delete()
         @_buffer = null
@@ -67,9 +67,11 @@ class W3hearWorker.SphinxDriver extends W3hearWorker.Driver
       # Could not reuse an existing buffer, must create a new one.
       @_buffer = new @_module.AudioBuffer()
       for i in [0...samples[0].length]
-        @_buffer.push_back samples[0][i]
+        @_buffer.push_back (samples[0][i] + samples[1][i]) * 16383
 
-    @_recognizer.process @_buffer
+    status = @_recognizer.process @_buffer
+    if status isnt @_module.ReturnType.SUCCESS
+      @_module['PrintErr']('Recognizer.process() returned non-success status')
 
   # @see {W3hearWorker.Driver#_result}
   _result: ->
