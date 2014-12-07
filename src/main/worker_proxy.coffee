@@ -27,18 +27,41 @@ class W3hear._.WorkerProxy
     workerFile = options.workerFile || 'w3hear_worker.js'
     @_startWorker workerFile
 
-  # Forcibly terminates this proxy's Web worker.
+  # Sends sound data to the Web worker.
+  #
+  # @param {Array<ArrayBuffer>} samples a typed array for each sound channel;
+  #   this method will neuter the typed arrays
+  # @return undefined
+  sendSamples: (samples) ->
+    @_worker.postMessage { type: 'sound', samples: samples }, samples
+    return
+
+  # Asks the Web worker to produce a speech recognition hypothesis.
+  #
+  # The worker produces hypothesis periodically. This is called when the API
+  # user specifically ends the speech recognition process and asks for a final
+  # hypothesis
   #
   # @return undefined
-  terminate: ->
-    if @_worker isnt null
-      @_worker.terminate()
-      @_worker = null
+  requestResult: ->
+    @_worker.postMessage { type: 'stop' }, samples
+    return
+
+  # Called when the Web worker produces a speech recognition hypothesis.
+  #
+  # @param {W3hear.SpeechRecognitionResultList} results the hypothesis produced
+  #   by the worker
+  # @return ignored
+  onResult: (results) ->
     return
 
   # Called when the speech recognition engine logs a message.
   #
-  # This only happens when engine debugging is enabled.
+  # This methd is only called when engine debugging is enabled.
+  #
+  # The method is public so applications can override it if they wish to
+  # implement custom logging, such as uploading error logs to an analytics
+  # server.
   #
   # @param {String} level 'info' or 'error'
   # @param {String} message the message logged by the engine
@@ -53,6 +76,19 @@ class W3hear._.WorkerProxy
         throw new Error("Invalid dlog level: #{level}")
     return
 
+  # Forcibly terminates this proxy's Web worker.
+  #
+  # This method is intended to facilitate testing. Terminating the Web worker
+  # may leave the W3hear recognizer that depends on the worker in an undefined
+  # state.
+  #
+  # @return undefined
+  terminate: ->
+    if @_worker isnt null
+      @_worker.terminate()
+      @_worker = null
+    return
+
   # Called when a message is received from the worker.
   #
   # @param {MessageEvent} event contains the received message
@@ -65,6 +101,9 @@ class W3hear._.WorkerProxy
       when 'ready'
         @ready = true
         @onReady.dispatch @
+      when 'result'
+        @onResult new W3hear.SpeechRecognitionResultList(data)
+    return
 
   # Creates the Worker and sends it the information that it needs to boot.
   #
@@ -82,18 +121,6 @@ class W3hear._.WorkerProxy
         type: 'boot', path: @_path, engine: @_engine, model: @_model,
         debug: @_debug)
     return
-
-  # Sends a message to the worker.
-  #
-  # @private
-  # This is called by the public API functions when necessary.
-  #
-  # @param {Object} data the message, which will be subjected to the structured
-  #   cloning algorithm
-  # @param {Object} transferables sequence of typed arrays that will be
-  #   neutered when sending them to the worker
-  _postMessage: (data, transferables) ->
-    @_worker.postMessage data, transferables
 
   # @property {W3hear._.EventSource} fires an event when the speech recognition
   #   engine finishes booting and can start processing sound

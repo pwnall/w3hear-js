@@ -27,7 +27,7 @@ class W3hearWorker.Loader
     driverClass = @_driverClass options.engine
     @_loadFiles [driverClass.engineFile,
                  driverClass.modelDataFile(options.model)]
-    @_driver = new driverClass @_module, options
+    @_driver = new driverClass(@_module, options)
     @_driver
 
   # Loads an Emscripten file.

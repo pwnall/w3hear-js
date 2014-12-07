@@ -10,19 +10,6 @@ class W3hearWorker.ControllerClass
     @_wired = false
     @_wireListener()
 
-  # Boots the worker.
-  #
-  # @return undefined
-  boot: (data) ->
-    if @_loader isnt null
-      throw new Error("The worker has already booted")
-
-    @_path = data.path
-    @_loader = new W3hearWorker.Loader @_path, @
-    @_engine = @_loader.loadEngine data
-    @_postMessage type: 'ready'
-    return
-
   # Called when the speech recognition engine wants to log an error message.
   #
   # @param {String} message the message to be logged
@@ -36,6 +23,45 @@ class W3hearWorker.ControllerClass
   # @return undefined
   onPrint: (message) ->
     @_postMessage type: 'dlog', level: 'info', message: message
+    return
+
+  # Boots the worker.
+  #
+  # @param {Object} the message received from the master that contains
+  #   initialization settings, such as the speech engine and model data to be
+  #   loaded into this worker
+  # @return undefined
+  _boot: (data) ->
+    if @_loader isnt null
+      throw new Error("The worker has already booted")
+
+    @_path = data.path
+    @_loader = new W3hearWorker.Loader @_path, @
+    @_engine = @_loader.loadEngine data
+    @_postMessage type: 'ready'
+    return
+
+  # Called when the master sent sound samples for processing.
+  #
+  # @param {Object} the message received from the master that contains the
+  #   sound samples
+  # @return undefined
+  _onSamples: (data) ->
+    return if @_engine is null
+    # TODO(pwnall): resample
+    @_engine.process data.samples
+    result = @_engine.result true
+    unless result is null
+      @_postMessage type: 'result', result: result
+    return
+
+  # Called when the master asked that the recognition be stopped.
+  #
+  # @return undefined
+  _onStopRequest: ->
+    @_engine.stop()
+    result = @_engine.result false
+    @_postMessage type: 'result', result: result
     return
 
   # Sets up the controller's listener to receive the worker's messages.
@@ -56,7 +82,12 @@ class W3hearWorker.ControllerClass
     data = event.data
     switch data.type
       when 'boot'
-        @boot data
+        @_boot data
+      when 'sound'
+        @_onSamples data
+      when 'stop'
+        @_onStopRequest()
+        null
     return
 
   # Sends a message to the worker's master.

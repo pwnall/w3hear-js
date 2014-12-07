@@ -17,6 +17,9 @@ class W3hear._.Capture
     # TODO(pwnall): investigate using 0 output channels in the browser; the
     #               node.js polyfill crashes when 0 is specified, but the Web
     #               Audio API spec seems to allow that
+    # TODO(pwnall): look into whether we need to fall back to
+    #               createJavaScriptNode
+    # https://developer.mozilla.org/en-US/docs/Web/API/AudioContext.createJavaScriptNode
     @_node = @_context.createScriptProcessor @_bufferSize, 2, 2
     @_node.onaudioprocess = @_onAudioProcess.bind @
     @_node.connect @_context.destination

@@ -1,7 +1,7 @@
 # This is a node.js-only test that verifies that pocketsphinx.js presents the
 # interface that we expect.
 
-# HACK: skip all the tests in the browser.
+# Skip the sphinx.js tests in the browser.
 if testSphinxLoader is null
   describe = -> null
 else
