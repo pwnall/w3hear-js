@@ -1,6 +1,6 @@
 Capture = W3hear._.Capture
 
-describe 'Capture', ->
+describe.only 'Capture', ->
   beforeEach ->
     @capture = new Capture inputBufferSize: 4096
 
@@ -37,6 +37,7 @@ describe 'Capture', ->
         rightData[i] = @right[i]
       @source = @context.createBufferSource()
       @source.buffer = @buffer
+      @source.loop = false
       if @useMediaStream
         @destination = @context.createMediaStreamDestination()
         @source.connect @destination
@@ -46,6 +47,7 @@ describe 'Capture', ->
         @stream = { _source: @source }
         @context.createMediaStreamSource = (stream) =>
           expect(stream).to.equal @stream
+          expect(stream._source).to.equal @source
           return stream._source
 
     afterEach ->
@@ -53,9 +55,9 @@ describe 'Capture', ->
       @capture.stop()
       @source.stop()
       if @destination
-        @source.disconnect @destination
+        @source.disconnect()
 
-    it 'calls onSample correctly when left to its own devices', (done) ->
+    it 'calls onSample correctly', (done) ->
       # NOTE: we use the fact that the first sample is non-zero to sync
       expect(@left[0]).not.to.equal 0
 
@@ -83,4 +85,4 @@ describe 'Capture', ->
         @source.stop()
         done()
       @capture.start @stream
-      @source.start()
+      @source.start @context.currentTime, 0

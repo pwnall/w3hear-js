@@ -45,7 +45,7 @@ class W3hear._.Capture
     return if @_started is false
     @_started = false
     if @_source isnt null
-      @_source.disconnect @_node
+      @_source.disconnect()
       @_source = null
       @_stream = null
     return

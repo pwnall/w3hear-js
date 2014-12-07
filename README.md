@@ -30,6 +30,13 @@ brew install python
 git clone
 git submodule init
 git submodule update
+npm install -g coffee-script
+npm install
 ./script/build_fastcomp.sh
 ./script/build_sphinx.sh
+```
+
+```bash
+cd node_modules/web-audio-api
+npm install
 ```
