@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>w3hear.js test suite</title>
+  <link rel="stylesheet" href="../../node_modules/mocha/mocha.css" />
+
+  <script src="../../lib/w3hear.js"></script>
+
+  <!-- NOTE: the list of files below must be kept in sync with
+             test/src/helpers/web_worker_main.coffee -->
+
+  <script src="../../test/vendor/sinon.js"></script>
+  <!--[if IE]>
+  <script src="../../test/vendor/sinon-ie.js"></script>
+  <![endif]-->
+  <script src="../../test/vendor/chai.js"></script>
+  <script src="../../node_modules/sinon-chai/lib/sinon-chai.js"></script>
+  <script src="../../node_modules/mocha/mocha.js"></script>
+  <script src="../../test/js/helpers/browser_mocha_setup.js"></script>
+
+  <script src="../../test/js/helpers/setup.js"></script>
+
+  <script src="../../test/js/capture_test.js"></script>
+
+  <script src="../../test/js/helpers/browser_mocha_runner.js"></script>
+
+  <style type="text/css">
+    /* Get scrolling to work in Chrome apps. */
+    html {
+      overflow-y: scroll;
+    }
+  </style>
+</head>
+<body>
+  <div id="mocha"></div>
+</body>
+</html>

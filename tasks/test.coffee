@@ -9,7 +9,7 @@ nodetest = (callback) ->
   test_cases = glob.sync 'test/js/**/*_test.js'
   test_cases.sort()  # Consistent test case order.
   run 'node node_modules/mocha/bin/mocha --colors --slow 200 ' +
-      "--timeout 5000 --reporter #{reporter} --globals W3gram " +
+      "--timeout 5000 --reporter #{reporter} --globals W3hear " +
       '--require test/js/helpers/setup.js ' + test_cases.join(' '),
       noExit: true, (code) ->
         callback(code) if callback

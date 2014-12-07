@@ -35,7 +35,10 @@
     "sinon-chai": ">= 2.3.1",
     "source-map-support": ">= 0",
     "uglify-js": ">= 2.4.15",
-    "watch": ">= 0.13.0"
+    "watch": ">= 0.13.0",
+    "web-audio-api": ">= 0.1.5",
+    "webworker-threads": ">= 0.5.3"
+
   },
   "main": "lib/index.js",
   "directories": {
