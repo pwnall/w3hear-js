@@ -8,17 +8,29 @@ Learning to code is both incredibly valuable, and incredibly tedious. When hours
 of painful debugging are not rewarded by "a-ha!" moments, people become
 discouraged and give up. Maximizing these small victories is important to easing
 the learning process, especially for children. W3Ear makes programming more
-exciting by giving your code ears.
+exciting by giving your code ears!
 
 We've chosen to tackle the Koding Global Virtual Hackathon's 2nd theme:
-Introducing software development to a beginner. We want to help beginners stay
-motivated as they run into obstacle after obstacle - a goal made difficult by
-the fact that the code-writing process mostly involves writing text and
+__Introducing software development to a beginner__. We want to help beginners
+stay motivated as they run into obstacle after obstacle - a goal made difficult
+by the fact that the code-writing process mostly involves writing text and
 reading... more text. W3Ear shakes up the programming experience by letting you
 run your code via voice commands. By taking advantage of the current state of
 Web audio technologies, we hope to make coding a more rewarding experience.
 
-## Development Prerequisites
+## Anatomy of the W3Ear
+
+Speech recognition requires several layers of processing. In the context of 
+web applications, the sound is first captured by the browser, then passed on to 
+a Speech Recognition Engine (SRE) for interpretation.
+
+### w3hear.js
+
+This file uses `getUserMedia()` from the WebRTC API and the
+[Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
+to obtain permission to use the user's microphone.
+
+## Prerequisites
 
 [enscripten](https://github.com/kripken/emscripten) requires
 [CMake](http://www.cmake.org/),
