@@ -4,10 +4,10 @@
 # Skip the tests in the browser.
 if typeof W3hearWorker is 'undefined'
   describe = -> null
+  Driver = null
 else
   describe = W3hearWorker.global.describe
-
-Driver = W3hearWorker.Driver
+  Driver = W3hearWorker.Driver
 
 describe 'Worker.Driver', ->
   beforeEach ->

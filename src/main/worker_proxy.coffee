@@ -29,11 +29,13 @@ class W3hear._.WorkerProxy
 
   # Sends sound data to the Web worker.
   #
-  # @param {Array<ArrayBuffer>} samples a typed array for each sound channel;
+  # @param {Array<Float32Array>} samples a typed array for each sound channel;
   #   this method will neuter the typed arrays
   # @return undefined
   sendSamples: (samples) ->
-    @_worker.postMessage { type: 'sound', samples: samples }, samples
+    # NOTE: we can't transfer the sample buffers because Chrome reuses the
+    #       buffers; this probably makes sense for every implementation
+    @_worker.postMessage { type: 'sound', samples: samples }
     return
 
   # Asks the Web worker to produce a speech recognition hypothesis.
@@ -44,7 +46,7 @@ class W3hear._.WorkerProxy
   #
   # @return undefined
   requestResult: ->
-    @_worker.postMessage { type: 'stop' }, samples
+    @_worker.postMessage { type: 'stop' }
     return
 
   # Called when the Web worker produces a speech recognition hypothesis.

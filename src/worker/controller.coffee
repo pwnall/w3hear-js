@@ -48,7 +48,6 @@ class W3hearWorker.ControllerClass
   # @return undefined
   _onSamples: (data) ->
     return if @_engine is null
-    # TODO(pwnall): resample
     @_engine.process data.samples
     result = @_engine.result true
     unless result is null

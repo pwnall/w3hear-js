@@ -54,6 +54,9 @@ class W3hear._.Capture
     return
 
   # Called when audio samples are available.
+  #
+  # @param [Array<Float32Array>] samples one typed array for each channel
+  # @return ignored
   onSamples: (samples) ->
     return
 

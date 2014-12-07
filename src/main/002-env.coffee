@@ -13,6 +13,9 @@ if typeof global isnt 'undefined' and typeof module isnt 'undefined' and
   #               stable
   W3hear._.Worker = null  # require('webworker-threads').Worker
 
+  # No node.js polyfill for navigator.getUserMedia. This is useless without a
+  # Web Worker polyfill anyway.
+  W3hear._.getUserMedia = null
 
 else if typeof window isnt 'undefined' and typeof navigator isnt 'undefined'
   # Running inside a browser.
@@ -22,7 +25,9 @@ else if typeof window isnt 'undefined' and typeof navigator isnt 'undefined'
   # Web APIs.
   W3hear._.AudioContext = window.AudioContext || window.webkitAudioContext
   W3hear._.Worker = window.Worker
-
+  W3hear._.getUserMedia = (navigator.getUserMedia ||
+      navigator.webkitGetUserMedia || navigator.mozGetUserMedia).
+      bind(navigator)
 
 else
   throw new Error 'w3hear.js loaded in an unsupported JavaScript environment.'

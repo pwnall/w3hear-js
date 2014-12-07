@@ -8,16 +8,16 @@ describe 'Capture', ->
     beforeEach ->
       # NOTE: the node.js polyfill doesn't implement MediaStream integration,
       #       so we use a stubbing hack there
-      # NOTE 2: the MediaStream implementation is unstable in Chrome, which
-      #         makes this test unreliable
+      # NOTE 2: the MediaStream implementation is unstable in Chrome, so we
+      #         have to use the stubbing hack here too
       @useMediaStream = !!(
           W3hear._.AudioContext.prototype.createMediaStreamSource &&
           W3hear._.AudioContext.prototype.createMediaStreamDestination &&
           W3hear._.global.navigator &&
           /firefox/i.test('' + W3hear._.global.navigator.userAgent))
 
-      @left = new Array 12288
-      @right = new Array 12288
+      @left = new Float32Array 12288
+      @right = new Float32Array 12288
       for i in [0...12288]
         # Sample data that does not repeat by a power of two and consists
         # solely of 1, 0 and -1, so no floating point oddness happens.
@@ -65,14 +65,18 @@ describe 'Capture', ->
       right = []
       @capture.onSamples = (samples) =>
         expect(samples.length).to.equal 2
+        expect(samples[0]).to.be.an.instanceOf Float32Array
+        expect(samples[1]).to.be.an.instanceOf Float32Array
         expect(samples[0].length).to.equal samples[1].length
-        for i in [0...samples[0].length]
-          # HACK(pwnall): synchronizing in the stream
-          continue if left.length is 0 and samples[0][i] != @left[0]
-          break if left.length is @left.length
 
-          left.push samples[0][i]
-          right.push samples[1][i]
+        lSamples = samples[0]
+        rSamples = samples[1]
+        for i in [0...lSamples.length]
+          # HACK(pwnall): synchronizing in the stream
+          continue if left.length is 0 and lSamples[i] != @left[0]
+          break if left.length is @left.length
+          left.push lSamples[i]
+          right.push rSamples[i]
         return unless left.length >= @left.length
 
         for i in [0..@left.length]

@@ -14,13 +14,16 @@ class W3hearWorker.Driver
   # Subclasses should override the protected {#_process} method, which is
   # guaranteed to be called when the engine is in a started state.
   #
-  # @param {Array<ArrayBuffer>} samples one array for each sound channel;
+  # @param {Array<Float32Array>} samples one array for each sound channel;
   #   stereo sound will have two channels
   # @return undefined
   process: (samples) ->
     if @_started is false
       @_start()
       @_started = true
+
+    # TODO(pwnall): resample
+
     @_process samples
     return
 
