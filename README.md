@@ -49,22 +49,39 @@ want to build additional speech recognition engines or models into the library.
 ### Prerequisites
 
 [enscripten](https://github.com/kripken/emscripten) requires
+a C++ compiler toolchain,
 [CMake](http://www.cmake.org/),
 [Git](http://git-scm.com/),
 [python](https://www.python.org/),
 [node.js](http://nodejs.org/).
 
-We recommend [nvm](https://github.com/creationix/nvm) for installing and
-managing node.js. The following commands will install the other packages on
-OSX.
+#### Mac OS X
 
+We recommend [Homebrew](http://brew.sh/) for package management and
+[nvm](https://github.com/creationix/nvm) for setting up node.js.  The Homebrew
+setup process will walk you through installing the Command Line Tools for
+Xcode, which provide a C++ compiler toolchain.
+
+If you follow the recommendations, the following comands get the prerequisites
+installed.
 
 ```bash
 brew install cmake
 brew install git
 brew install python
+nvm install 0.10
+nvm use 0.10  # Issue this when working on w3hear.js
 
-# Install nvm and use it to install node.js.
+# If you set node 0.10 as a default, you don't need the command above.
+nvm alias default 0.10
+```
+
+#### Ubuntu / Debian
+
+The following commands will install the prerequisites.
+
+```bash
+sudo apt-get install build-essential cmake git python2.7 node.js
 ```
 
 
@@ -72,6 +89,9 @@ brew install python
 
 ```bash
 git clone git@github.com:pwnall/w3hear-js.git
+# If SSH is blocked, use the following alternative.
+#     git clone https://github.com/pwnall/w3hear-js.git
+cd w3hear-js
 git submodule init
 git submodule update
 npm install -g coffee-script
