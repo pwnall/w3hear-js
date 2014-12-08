@@ -4,6 +4,12 @@ describe 'Capture', ->
   beforeEach ->
     @capture = new Capture inputBufferSize: 4096
 
+  describe '#sampleRate', ->
+    it 'is a number between 8k and 1M', ->
+      expect(@capture.sampleRate()).to.be.a 'number'
+      expect(@capture.sampleRate()).to.be.at.least 8000
+      expect(@capture.sampleRate()).to.be.at.most 1000000
+
   describe 'with a MediaStream', ->
     beforeEach ->
       # NOTE: the node.js polyfill doesn't implement MediaStream integration,

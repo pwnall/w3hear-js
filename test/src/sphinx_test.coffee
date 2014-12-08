@@ -7,7 +7,7 @@ if testSphinxLoader is null
 else
   describe = W3hear._.global.describe
 
-describe.only 'lib/sphinx/pocketsphinx.js', ->
+describe 'lib/sphinx/pocketsphinx.js', ->
   before ->
     @sphinx = testSphinxLoader._module
 

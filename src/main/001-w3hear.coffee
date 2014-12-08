@@ -11,9 +11,10 @@ class W3hear
   constructor: (options) ->
     options ||= {}
     @_stream = null
-    @_proxy = new W3hear._.WorkerProxy options
-    @_proxy.onResult = @_onWorkerResult.bind(@)
     @_capture = new W3hear._.Capture options
+    system = sampleRate: @_capture.sampleRate()
+    @_proxy = new W3hear._.WorkerProxy system, options
+    @_proxy.onResult = @_onWorkerResult.bind(@)
     # NOTE: the Capture object only generates samples when started, so we don't
     #       need to worry about posting useless messages to the Web Worker
     @_capture.onSamples = @_proxy.sendSamples.bind(@_proxy)

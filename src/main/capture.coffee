@@ -14,12 +14,15 @@ class W3hear._.Capture
     @_stream = null
     @_source = null
     @_context = new W3hear._.AudioContext()
-    # TODO(pwnall): investigate using 0 output channels in the browser; the
-    #               node.js polyfill crashes when 0 is specified, but the Web
-    #               Audio API spec seems to allow that
+    @_rate = @_context.sampleRate
+    # HACK(pwnall): we should be using 0 output channels, but we can't, because
+    #     of implementation bugs; Firefox handles this correctly, but Chrome
+    #     doesn't issue audioprocess events, and the node.js polyfill throws an
+    #     exception; it'd be easy to try/catch around the polyfill issue, but
+    #     we have no solution for Chrome
     # TODO(pwnall): look into whether we need to fall back to
-    #               createJavaScriptNode
-    # https://developer.mozilla.org/en-US/docs/Web/API/AudioContext.createJavaScriptNode
+    #      createJavaScriptNode
+    #      https://developer.mozilla.org/en-US/docs/Web/API/AudioContext.createJavaScriptNode
     @_node = @_context.createScriptProcessor @_bufferSize, 2, 2
     @_node.onaudioprocess = @_onAudioProcess.bind @
     @_node.connect @_context.destination
@@ -59,6 +62,12 @@ class W3hear._.Capture
   # @return ignored
   onSamples: (samples) ->
     return
+
+  # The number of samples per second captured for each channel.
+  #
+  # @return {Number} number of samples per second captured
+  sampleRate: ->
+    @_rate
 
   # Called when audio data is available for processing.
   _onAudioProcess: (event) ->

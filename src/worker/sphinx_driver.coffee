@@ -11,8 +11,16 @@ class W3hearWorker.SphinxDriver extends W3hearWorker.Driver
     @_config = null
     @_recognizer = null
     @_buffer = null
+    @_outIndex = 0
+    @_outAccum = 0
+    @_outCount = 0
+
+    @_inRate = options.rate
+    @_outRate = options.modelRate or 16000
+
     @_buildConfig options
     @_buildRecognizer()
+    @_resetResampler()
 
   # Builds the Config object for pocketsphinx.
   #
@@ -48,26 +56,14 @@ class W3hearWorker.SphinxDriver extends W3hearWorker.Driver
 
   # @see {W3hearWorker.Driver#_stop}
   _stop: ->
+    @_resetResampler()
     status = @_recognizer.stop()
     if status isnt @_module.ReturnType.SUCCESS
       @_module['PrintErr']('Recognizer.stop() returned non-success status')
 
   # @see {W3hearWorker.Driver#_process}
   _process: (samples) ->
-    if @_buffer isnt null
-      # Reuse existing buffer if possible, to reduce GC pressure.
-      if samples[0].length is @_buffer.size()
-        for i in [0...samples[0].length]
-          @_buffer.set i, (samples[0][i] + samples[1][i]) * 16383
-      else
-        @_buffer.delete()
-        @_buffer = null
-
-    if @_buffer is null
-      # Could not reuse an existing buffer, must create a new one.
-      @_buffer = new @_module.AudioBuffer()
-      for i in [0...samples[0].length]
-        @_buffer.push_back (samples[0][i] + samples[1][i]) * 16383
+    @_resample samples
 
     status = @_recognizer.process @_buffer
     if status isnt @_module.ReturnType.SUCCESS
@@ -77,6 +73,53 @@ class W3hearWorker.SphinxDriver extends W3hearWorker.Driver
   _result: ->
     text = @_recognizer.getHyp()
     { text: text, conf: 0 }
+
+  # Cleans the resampler state.
+  _resetResampler: ->
+    if @_buffer isnt null
+      @_buffer.delete()
+      @_buffer = null
+    @_buffer = new @_module.AudioBuffer()
+    @_outIndex = 0
+    @_outAccum = 0
+    @_outCount = 0
+
+  # Handles resampling and conversion from Float32Array to Int16Array.
+  #
+  # @param {Array<Float32Array>} samples the sound data to be resampled
+  _resample: (samples) ->
+    bufferSize = @_buffer.size()
+    usePush = bufferSize is 0
+    j = 0
+
+    # outIndex is the fractional part of the position in the output buffer,
+    # multiplied by the input sample rate.
+    #
+    # Whenever we process an input sample, outIndex jumps by the output sample
+    # rate. When outIndex exceeds the input sample rate, we're ready to output
+    # a sample and reduce outIndex by the input rate. (modular reduction)
+    for i in [0...samples[0].length]
+      sample = samples[0][i] + samples[1][i]
+      @_outAccum += sample
+      @_outCount += 1
+      @_outIndex += @_outRate
+      if @_outIndex >= @_inRate
+        @_outIndex -= @_inRate
+        value = (@_outAccum / @_outCount) * 16383
+        if @_outIndex is 0
+          @_outAccum = 0
+          @_outCount = 0
+        else
+          @_outAccum = sample
+          @_outCount = 1
+        if usePush
+          @_buffer.push_back value
+        else
+          @_buffer.set j, value
+          j += 1
+          if j is @_buffer.size()
+            # We might end up dropping extra samples
+            return
 
   # @see {W3hearWorker.Driver#modelDataFile}
   @modelDataFile: (model) ->

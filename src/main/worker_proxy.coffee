@@ -2,25 +2,34 @@
 class W3hear._.WorkerProxy
   # Creates a new proxy for a Web worker running a speech recognition engine.
   #
+  # @param {Object} system host system configuration details
+  # @option system {Number} sampleRate the sampling rate of the Web Audio
+  #   context used to process microphone information
   # @param {Object} options configuration for the worker
-  # @option {String} workerPath the directory that contains the worker script;
-  #   this must also contain the compiled speech engines and data files
-  # @option {String} workerFile the name of the worker file; the default is
-  #   'w3hear_worker.js'
-  # @option {String} engine the name of the desired speech engine; the default
-  #   is 'sphinx'
-  # @option {String} modelData the name of the data file for the speech
+  # @option options {String} workerPath the directory that contains the worker
+  #   script; this must also contain the compiled speech engines and data files
+  # @option options {String} workerFile the name of the worker file; the
+  #   default is 'w3hear_worker.js'
+  # @option options {String} engine the name of the desired speech engine; the
+  #   default is 'sphinx'
+  # @option options {String} modelData the name of the data file for the speech
   #   engine's model; the default is 'en'
-  # @option {Boolean} engineDebug if true, the engine's output is sent to the
-  #   console
-  constructor: (options) ->
+  # @option options {Boolean} engineDebug if true, the engine's output is sent
+  #   to the console; debug output is disabled by default
+  # @option options {Number} modelRate the sample rate used the data files; by
+  #   default, the engine is instructed to choose its (default) rate
+  constructor: (system, options) ->
     @onReady = new W3hear._.EventSource()
+    @_rate = system.sampleRate
     options ||= {}
     @_engine = options.engine or 'sphinx'
     @_debug = !!options.engineDebug
     @_model = options.modelData or 'en'
+    @_modelRate = options.modelRate or null
+    # TODO(pwnall): consider using the directory part of window.location as a
+    #               default, when available
     @_path = options.workerPath
-    unless @_path.substring(@_path.length - 1, 1) is '/'
+    unless @_path.substring(@_path.length - 1) is '/'
       @_path += '/'
     @_worker = null
 
@@ -121,7 +130,7 @@ class W3hear._.WorkerProxy
     @_worker.onmessage = @_onMessage.bind @
     @_worker.postMessage(
         type: 'boot', path: @_path, engine: @_engine, model: @_model,
-        debug: @_debug)
+        debug: @_debug, rate: @_rate, modelRate: @_modelRate)
     return
 
   # @property {W3hear._.EventSource} fires an event when the speech recognition

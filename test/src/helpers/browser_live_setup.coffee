@@ -1,14 +1,19 @@
 window.addEventListener 'load', ->
   transcriptElement = document.querySelector '#transcript'
+  startButton = document.querySelector '#start'
+  stopButton = document.querySelector '#stop'
+
   window.recognizer = new W3hear(
       engine: 'sphinx', engineDebug: true, modelData: 'en',
       workerPath: window.location.origin + '/lib',
       workerFile: 'w3hear_worker.min.js')
   recognizer.onresult = (event) ->
-    console.log event
     transcriptElement.value = event.results[0][0].transcript
+  recognizer._proxy.onReady.addListener ->
+    startButton.disabled = false
+    stopButton.disabled = false
 
-  document.querySelector('#start').addEventListener 'click', ->
+  startButton.addEventListener 'click', ->
     recognizer.start()
-  document.querySelector('#stop').addEventListener 'click', ->
+  stopButton.addEventListener 'click', ->
     recognizer.stop()

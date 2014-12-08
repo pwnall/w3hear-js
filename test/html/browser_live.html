@@ -5,15 +5,22 @@
   <title>w3hear.js live test page</title>
   <script src="../../lib/w3hear.min.js"></script>
   <script src="../../test/js/helpers/browser_live_setup.js"></script>
+  <style type="text/css">
+    #transcript {
+      width: 100%;
+      height: 3em;
+      display: inline-block;
+    }
+  </style>
 </head>
 <body>
   <h1>w3hear.js live test page</h1>
   <p>
-    <input type="text" id="transcript" />
+    <textarea id="transcript"></textarea>
   </p>
   <p>
-    <button type="button" id="start">Start</button>
-    <button type="button" id="stop">Stop</button>
+    <button type="button" id="start" disabled="disabled">Start</button>
+    <button type="button" id="stop" disabled="disabled">Stop</button>
   </p>
 </body>
 </html>

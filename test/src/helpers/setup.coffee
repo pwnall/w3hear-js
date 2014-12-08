@@ -15,8 +15,10 @@ if global? and require? and module? and (not cordova?)
     onPrintError: console.error
   }
   exports.testSphinxLoader = new exports.W3hearWorker.Loader null, controller
+  # NOTE: the resampling code is tested separately, so we set the input rate to
+  #       match the engine's internal rate
   exports.testSphinxLoader.loadEngine(
-      engine: 'sphinx', debug: false, model: 'digits')
+      engine: 'sphinx', debug: false, model: 'digits', rate: 16000)
   exports.testXhrServer = ''
 
 else
