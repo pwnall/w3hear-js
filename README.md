@@ -81,9 +81,10 @@ nvm use 0.10  # Issue this when working on w3hear.js
 nvm alias default 0.10
 ```
 
-#### Ubuntu / Debian
+#### Ubuntu / Debian / Koding
 
-The following commands will install the prerequisites.
+The following commands will install the prerequisites. This is the appropriate
+setup if you're using [Koding](https://koding.com/).
 
 ```bash
 sudo apt-get install build-essential cmake git python2.7 node.js
