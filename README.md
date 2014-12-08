@@ -1,4 +1,4 @@
-# W3Ear
+# w3hear-js
 
 Infrastructure for speech recognition in JavaScript.
 
@@ -7,18 +7,23 @@ Infrastructure for speech recognition in JavaScript.
 Learning to code is both incredibly valuable, and incredibly tedious. When hours
 of painful debugging are not rewarded by "a-ha!" moments, people become
 discouraged and give up. Maximizing these small victories is important to easing
-the learning process, especially for children. W3Ear makes programming more
+the learning process, especially for children. w3hear-js makes programming more
 exciting by giving your code ears!
 
 We've chosen to tackle the Koding Global Virtual Hackathon's 2nd theme:
 __Introducing software development to a beginner__. We want to help beginners
 stay motivated as they run into obstacle after obstacle - a goal made difficult
 by the fact that the code-writing process mostly involves writing text and
-reading... more text. W3Ear shakes up the programming experience by letting you
-run your code via voice commands. By taking advantage of the current state of
-Web audio technologies, we hope to make coding a more rewarding experience.
+reading... more text. w3hear-js shakes up the programming experience by letting you
+run your code via voice commands. For example, say you have a function
+`draw_circle() {...}` in your web application that draws a circle. Using w3hear-js,
+you can hook up that function to a voice command, like "Draw a circle!" Now you can
+run your code by talking, rather than by typing!
 
-## Anatomy of the W3Ear
+By taking advantage of the current state of Web audio technologies, we hope to make
+coding a more rewarding experience.
+
+## Anatomy
 
 The user's voice is first captured in the browser (__w3hear.js__). Speech
 recognition is then handed off to a background thread (__w3hear_worker.js__)
