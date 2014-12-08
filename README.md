@@ -101,8 +101,9 @@ git submodule init
 git submodule update
 npm install -g coffee-script
 npm install
-./script/build_fastcomp.sh
+./script/build_emscripten.sh
 ./script/build_sphinx.sh
+./script/build_sphinx_models.sh
 ```
 
 A NPM package that we depend on uses the gulp ES6 transpiler, so it needs its
