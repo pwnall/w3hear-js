@@ -55,7 +55,7 @@ describe 'Worker.SphinxDriver', ->
         expect([i, @driver._buffer.get(i)]).to.deep.equal(
             [i, -32766 + 65532 * (i % 2)])
 
-  describe.only 'with stubs', ->
+  describe 'with stubs', ->
     beforeEach ->
       # Stub for the embind std::vector interface.
       vector = class CVector
@@ -64,10 +64,15 @@ describe 'Worker.SphinxDriver', ->
           @_deleted = false
           @_data = []
         push_back: (e) ->
+          # HACK(pwnall): simulate the AudioBuffer rounding
+          e = Math.floor(e) if typeof e is 'number'
           @_data[@_length] = e
           @_length += 1
         get: (i) -> @_data[i]
-        set: (i, e) -> @_data[i] = e
+        set: (i, e) ->
+          # HACK(pwnall): simulate the AudioBuffer rounding
+          e = Math.floor(e) if typeof e is 'number'
+          @_data[i] = e
         size: -> @_length
         delete: ->
           @_deleted = true
@@ -103,18 +108,76 @@ describe 'Worker.SphinxDriver', ->
         expect(@driver._inRate).to.equal 44100
         expect(@driver._outRate).to.equal 16000
 
-    describe '#resample', ->
+    describe '#_resample', ->
+      describe 'with a 1/1 ratio', ->
+        beforeEach ->
+          @driver = new SphinxDriver @module, model: 'klingon', rate: 16000
+
+        it 'scales correctly', ->
+          samples = [new Float32Array(9), new Float32Array(9)]
+          source = [1, 0.75, 0.5, 0.25, 0, -0.25, -0.5, -0.75, -1]
+          for i in [0...9]
+            samples[0][i] = source[i]
+            samples[1][i] = source[i]
+
+          @driver._resample samples
+          expect(@driver._buffer._data).to.deep.equal(
+              [32766, 24574, 16383, 8191, 0, -8192, -16383, -24575, -32766])
+
+        it 'mixes the channels correctly', ->
+          samples = [new Float32Array(9), new Float32Array(9)]
+          source = [1, 0.75, 0.5, 0.25, 0, -0.25, -0.5, -0.75, -1]
+          for i in [0...9]
+            samples[0][i] = source[i]
+            samples[1][i] = -source[i]
+
+          @driver._resample samples
+          expect(@driver._buffer._data).to.deep.equal(
+              [0, 0, 0, 0, 0, 0, 0, 0, 0])
+
+        it 'has correct push_back and set write methods', ->
+          samples = [new Float32Array(9), new Float32Array(9)]
+          source = [1, 0.75, 0.5, 0.25, 0, -0.25, -0.5, -0.75, -1]
+
+          # Test the push_back write method.
+          for i in [0...9]
+            samples[0][i] = source[i]
+            samples[1][i] = source[i]
+          @driver._resample samples
+          expect(@driver._buffer._data).to.deep.equal(
+              [32766, 24574, 16383, 8191, 0, -8192, -16383, -24575, -32766])
+          oldBuffer = @driver._buffer
+
+          # Test the set write method.
+          for i in [0...9]
+            samples[0][i] = source[i]
+            samples[1][i] = -source[i]
+          @driver._resample samples
+          expect(@driver._buffer._data).to.deep.equal(
+              [0, 0, 0, 0, 0, 0, 0, 0, 0])
+          expect(@driver._buffer).to.equal oldBuffer
+
       describe 'with a 3/2 ratio', ->
         beforeEach ->
           @driver = new SphinxDriver @module, model: 'klingon', rate: 24000
 
         it 'resamples correctly without carryover', ->
           samples = [new Float32Array(9), new Float32Array(9)]
-          # [1, 1, 1, -1, -1, -1, 1, 1, 1]
+          source = [1, 1, 1, -1, -1, -1, 1, 1, 1]
           for i in [0...9]
-            samples[0][i] = -1 + 2 * (i % 2)
-            samples[1][i] = -1 + 2 * (i % 2)
+            samples[0][i] = source[i]
+            samples[1][i] = source[i]
 
+          # Test the push_back branch.
           @driver._resample samples
           expect(@driver._buffer._data).to.deep.equal(
-              [])
+              [32766, 32766, -32766, -32766, 32766, 32766])
+
+          # Test the set branch.
+          for i in [0...9]
+            samples[0][i] = -source[i]
+            samples[1][i] = -source[i]
+          @driver._resample samples
+          expect(@driver._buffer._data).to.deep.equal(
+              [-32766, -32766, 32766, 32766, -32766, -32766])
+

@@ -39,7 +39,14 @@ to obtain permission to use the user's microphone.
 
 WHO AM I? WHAT YEAR IS THIS?
 
-## Prerequisites
+
+## Development Instructions
+
+Read this section if you're interested in contributing to w3hear.js, or if you
+want to build additional speech recognition engines or models into the library.
+
+
+### Prerequisites
 
 [enscripten](https://github.com/kripken/emscripten) requires
 [CMake](http://www.cmake.org/),
@@ -60,10 +67,11 @@ brew install python
 # Install nvm and use it to install node.js.
 ```
 
-## Development Setup
+
+### Development Setup
 
 ```bash
-git clone
+git clone git@github.com:pwnall/w3hear-js.git
 git submodule init
 git submodule update
 npm install -g coffee-script
@@ -80,13 +88,29 @@ cd node_modules/web-audio-api
 npm install
 ```
 
-## Running tests
 
-The following commands run the node.js tests, the browser tests in your default
-browser, and the browser tests in Firefox.
+### Running tests
+
+In order to get full coverage, we must run the test suite in
+[node.js](https://nodejs.org),
+[Google Chrome](https://www.google.com/chrome/) and
+[Mozilla Firefox](https://www.mozilla.com/firefox/)
 
 ```bash
 cake test
 cake webtest
 BROWSER=firefox cake webtest
 ```
+
+At the time of this writing, only Firefox has a spec-compliant implementation
+of the Web Audio API. The tests use some hacks to make up for issues in Chrome.
+
+We currently only run unit tests for the Web Worker code in node.js, mostly due
+to convenience. It is possible to load these tests in a Web worker, but that
+requires some non-trivial infrastructure changes.
+
+
+## Copyright
+
+This project is Copyright (c) 2014 Victor Costan and Staphany Park, and
+distributed under the MIT License.

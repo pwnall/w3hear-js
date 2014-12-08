@@ -5,14 +5,17 @@
   "keywords": ["speech", "commands", "w3ear"],
   "homepage": "https://github.com/pwnall/w3hear-js",
   "author": "Victor Costan <victor@costan.us> (http://www.costan.us)",
+  "contributors": [
+    "Staphany Park <spark008@gmail.com>"
+  ],
   "license": "MIT",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/pwnall/w3hear.git"
+    "url": "https://github.com/pwnall/w3hear-js.git"
   },
   "bugs": {
-    "url": "https://github.com/pwnall/w3hear/issues"
+    "url": "https://github.com/pwnall/w3hear-js/issues"
   },
   "engines": {
     "node": ">= 0.10.33"
