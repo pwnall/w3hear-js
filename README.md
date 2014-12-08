@@ -105,14 +105,12 @@ npm install
 ./script/build_emscripten.sh
 ./script/build_sphinx.sh
 ./script/build_sphinx_models.sh
-```
 
-A NPM package that we depend on uses the gulp ES6 transpiler, so it needs its
-development dependencies and pre-packaging build step.
-
-```bash
+# A NPM package that we depend on uses the gulp ES6 transpiler, so it needs its
+# development dependencies and pre-packaging build step.
 cd node_modules/web-audio-api
 npm install
+cd ../..
 ```
 
 
