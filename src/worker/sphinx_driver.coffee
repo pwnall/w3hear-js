@@ -75,6 +75,8 @@ class W3hearWorker.SphinxDriver extends W3hearWorker.Driver
     { text: text, conf: 0 }
 
   # Cleans the resampler state.
+  #
+  # @return undefined
   _resetResampler: ->
     if @_buffer isnt null
       @_buffer.delete()
@@ -83,10 +85,12 @@ class W3hearWorker.SphinxDriver extends W3hearWorker.Driver
     @_outIndex = 0
     @_outAccum = 0
     @_outCount = 0
+    return
 
   # Handles resampling and conversion from Float32Array to Int16Array.
   #
   # @param {Array<Float32Array>} samples the sound data to be resampled
+  # @return undefined
   _resample: (samples) ->
     bufferSize = @_buffer.size()
     usePush = bufferSize is 0
@@ -117,9 +121,12 @@ class W3hearWorker.SphinxDriver extends W3hearWorker.Driver
         else
           @_buffer.set j, value
           j += 1
-          if j is @_buffer.size()
-            # We might end up dropping extra samples
-            return
+          if j is bufferSize
+            usePush = true
+
+    if usePush is false and j < bufferSize
+      @_buffer.resize j
+    return
 
   # @see {W3hearWorker.Driver#modelDataFile}
   @modelDataFile: (model) ->

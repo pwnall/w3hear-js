@@ -39,21 +39,68 @@ describe 'lib/sphinx/pocketsphinx.js', ->
     afterEach ->
       @buffer.delete()
 
-    it 'works like a std::vector of shorts', ->
-      expect(@buffer.size()).to.equal 0
+    describe 'constructor', ->
+      it 'creates an empty vector', ->
+        expect(@buffer.size()).to.equal 0
 
-      for i in [0...300]
-        @buffer.push_back i * 100
-        @buffer.push_back -i * 100
-      @buffer.push_back 42
-      expect(@buffer.size()).to.equal 601
+    describe '#get', ->
+      it 'returns undefined when out of bounds', ->
+        expect(@buffer.get(0)).to.equal undefined
 
-      for i in [0...300]
-        expect(@buffer.get(i * 2)).to.equal i * 100
-        expect(@buffer.get(i * 2 + 1)).to.equal -i * 100
-      expect(@buffer.get(600)).to.equal 42
+    describe '#push_back', ->
+      it 'works like the std::vector spec', ->
+        for i in [0...300]
+          @buffer.push_back i * 100
+          @buffer.push_back -i * 100
+        @buffer.push_back 42
+        expect(@buffer.size()).to.equal 601
 
-      expect(@buffer.get(601)).to.equal undefined
+        for i in [0...300]
+          expect(@buffer.get(i * 2)).to.equal i * 100
+          expect(@buffer.get(i * 2 + 1)).to.equal -i * 100
+        expect(@buffer.get(600)).to.equal 42
+        expect(@buffer.get(601)).to.equal undefined
+
+    describe '#set', ->
+      beforeEach ->
+        for i in [0...300]
+          @buffer.push_back 0
+          @buffer.push_back 0
+
+      it 'works like the std::vector spec', ->
+        for i in [0...300]
+          @buffer.set i * 2, -i * 100
+          @buffer.set i * 2 + 1, i * 100
+
+        for i in [0...300]
+          expect(@buffer.get(i * 2)).to.equal -i * 100
+          expect(@buffer.get(i * 2 + 1)).to.equal i * 100
+
+    describe '#resize', ->
+      beforeEach ->
+        for i in [0...300]
+          @buffer.push_back i * 100
+          @buffer.push_back -i * 100
+        @buffer.push_back 42
+
+      it 'shrinks the vector', ->
+        @buffer.resize 300
+        expect(@buffer.size()).to.equal 300
+        for i in [0...150]
+          expect(@buffer.get(i * 2)).to.equal i * 100
+          expect(@buffer.get(i * 2 + 1)).to.equal -i * 100
+        expect(@buffer.get(300)).to.equal undefined
+
+      it 'grows the vector', ->
+        @buffer.resize 620
+        expect(@buffer.size()).to.equal 620
+        for i in [0...300]
+          expect(@buffer.get(i * 2)).to.equal i * 100
+          expect(@buffer.get(i * 2 + 1)).to.equal -i * 100
+        expect(@buffer.get(600)).to.equal 42
+        for i in[601...620]
+          expect([i, @buffer.get(i)]).to.deep.equal [i, 0]
+        expect(@buffer.get(620)).to.equal undefined
 
   describe 'Config', ->
     beforeEach ->

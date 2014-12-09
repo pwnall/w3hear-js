@@ -21,6 +21,7 @@ rm -rf build/sphinx/sphinxbase
 cp -r third_party/sphinxbase build/sphinx/
 rm -rf build/sphinx/pocketsphinx
 cp -r third_party/pocketsphinx build/sphinx/
+cp src/engines/sphinx/* build/sphinx/src
 mkdir -p build/sphinx/build
 
 # Build pocketsphinx with Emscripten.

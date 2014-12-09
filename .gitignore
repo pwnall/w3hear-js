@@ -23,3 +23,6 @@ lib/w3hear_worker.min.js
 lib/w3hear_worker.min.map
 lib/sphinx/
 test/js/
+
+# Node packaging output.
+w3hear-*.tgz

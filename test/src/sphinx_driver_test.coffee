@@ -56,6 +56,9 @@ describe 'Worker.SphinxDriver', ->
             [i, -32766 + 65532 * (i % 2)])
 
   describe 'with stubs', ->
+    # NOTE: sphinx_test.coffee has tests for the actual Module interface; as
+    #       long as those pass, there is some assurance that the stub
+    #       implementation here is accurate
     beforeEach ->
       # Stub for the embind std::vector interface.
       vector = class CVector
@@ -74,6 +77,7 @@ describe 'Worker.SphinxDriver', ->
           e = Math.floor(e) if typeof e is 'number'
           @_data[i] = e
         size: -> @_length
+        resize: (s) -> @_data.splice s
         delete: ->
           @_deleted = true
           @_data = null  # Catch use-after-delete.
@@ -155,6 +159,48 @@ describe 'Worker.SphinxDriver', ->
           @driver._resample samples
           expect(@driver._buffer._data).to.deep.equal(
               [0, 0, 0, 0, 0, 0, 0, 0, 0])
+          expect(@driver._buffer).to.equal oldBuffer
+
+        it 'grows the buffer when necessary', ->
+          source = [1, 0.75, 0.5, 0.25, 0, -0.25, -0.5, -0.75, -1]
+
+          samples = [new Float32Array(4), new Float32Array(4)]
+          for i in [0...4]
+            samples[0][i] = source[5 + i]
+            samples[1][i] = source[5 + i]
+          @driver._resample samples
+          expect(@driver._buffer._data).to.deep.equal(
+              [-8192, -16383, -24575, -32766])
+          oldBuffer = @driver._buffer
+
+          samples = [new Float32Array(9), new Float32Array(9)]
+          for i in [0...9]
+            samples[0][i] = source[i]
+            samples[1][i] = source[i]
+          @driver._resample samples
+          expect(@driver._buffer._data).to.deep.equal(
+              [32766, 24574, 16383, 8191, 0, -8192, -16383, -24575, -32766])
+          expect(@driver._buffer).to.equal oldBuffer
+
+        it 'shrinks the buffer when necessary', ->
+          source = [1, 0.75, 0.5, 0.25, 0, -0.25, -0.5, -0.75, -1]
+
+          samples = [new Float32Array(9), new Float32Array(9)]
+          for i in [0...9]
+            samples[0][i] = source[i]
+            samples[1][i] = source[i]
+          @driver._resample samples
+          expect(@driver._buffer._data).to.deep.equal(
+              [32766, 24574, 16383, 8191, 0, -8192, -16383, -24575, -32766])
+          oldBuffer = @driver._buffer
+
+          samples = [new Float32Array(4), new Float32Array(4)]
+          for i in [0...4]
+            samples[0][i] = source[5 + i]
+            samples[1][i] = source[5 + i]
+          @driver._resample samples
+          expect(@driver._buffer._data).to.deep.equal(
+              [-8192, -16383, -24575, -32766])
           expect(@driver._buffer).to.equal oldBuffer
 
       describe 'with a 3/2 ratio', ->
