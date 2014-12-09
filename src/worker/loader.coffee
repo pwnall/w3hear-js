@@ -25,8 +25,17 @@ class W3hearWorker.Loader
 
     @_prepareModule options if @_module is null
     driverClass = @_driverClass options.engine
-    @_loadFiles [driverClass.modelDataFile(options.model),
-                 driverClass.engineFile]
+    # NOTE: in general, it is recommended to eval the data (the files that make
+    #       up the virtual filesystem) before the engine code; in live testing,
+    #       loading the data first gets the Emscripten code stuck, so we eval
+    #       the code first; the array below is specifically formatted so that
+    #       changing the eval order produces a minimal diff
+    files = [
+      driverClass.engineFile,
+      driverClass.modelDataFile(options.model),
+    ]
+    @_loadFiles files
+
     @_driver = new driverClass(@_module, options)
     @_driver
 
