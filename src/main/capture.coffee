@@ -13,7 +13,7 @@ class W3hear._.Capture
     @_started = false
     @_stream = null
     @_source = null
-    @_context = new W3hear._.AudioContext()
+    @_context = W3hear._.Capture.audioContext()
     @_rate = @_context.sampleRate
     # HACK(pwnall): we should be using 0 output channels, but we can't, because
     #     of implementation bugs; Firefox handles this correctly, but Chrome
@@ -56,6 +56,21 @@ class W3hear._.Capture
       @_stream = null
     return
 
+  # Removes all the resources associated with this capture object.
+  #
+  # After this method is called, the capture is stopped and cannot be resumed.
+  #
+  # This is mostly intended for testing. Applications that use the W3hear
+  # object will always have exactly one capture object.
+  #
+  # @return undefined
+  release: ->
+    @stop()
+    @_node.disconnect()
+    @_node = null
+    @_context = null
+    return
+
   # Called when audio samples are available.
   #
   # @param [Array<Float32Array>] samples one typed array for each channel
@@ -77,5 +92,17 @@ class W3hear._.Capture
     @onSamples samples
     return
 
-  # Entry point to the Web Audio API.
-  @
+  # Creates a Web Audio API context for the given options.
+  #
+  # @param {Object} options capture parameters passed to the {W3hear._.Capture}
+  #   constructor
+  # @return {AudioContext{ a Web Audio API context that follows the given
+  #   options
+  @audioContext: (options) ->
+    @_context ||= new W3hear._.AudioContext()
+
+  # The shared AudioContext used by all instances of this class.
+  #
+  # This can be set to an existing context by applications that use the Web
+  # Audio API elsewhere.
+  @_context: null

@@ -15,6 +15,7 @@ describe 'W3hear', ->
   afterEach ->
     @w3hear.stop()
     @w3hear._proxy._worker.terminate()
+    @w3hear._capture.release()
 
   describe 'with a mock error', ->
     beforeEach ->
@@ -61,3 +62,28 @@ describe 'W3hear', ->
         expect(event.results[0][0].transcript).to.equal ''
         done()
       @w3hear.start()
+
+    it 'generates a final result', (done) ->
+      @w3hear.onresult = (event) =>
+        expect(event).to.be.ok
+        expect(event).to.be.an.instanceOf W3hear.SpeechRecognitionEvent
+        expect(event.results.length).to.equal 1
+        expect(event.results[0].length).to.equal 1
+        expect(event.results[0].isFinal).to.equal false
+        expect(event.results[0][0].transcript).to.equal ''
+        @w3hear.onresult = (event) =>
+          expect(event).to.be.ok
+          expect(event).to.be.an.instanceOf W3hear.SpeechRecognitionEvent
+          expect(event.results.length).to.equal 1
+          expect(event.results[0].length).to.equal 1
+          return unless event.results[0].isFinal is true
+          expect(event.results[0].isFinal).to.equal true
+          expect(event.results[0][0].transcript).to.equal ''
+          expect(@w3hear._started).to.equal false
+          expect(@w3hear._wantFinalResult).to.equal false
+          done()
+        @w3hear.stop()
+        expect(@w3hear._started).to.equal false
+        expect(@w3hear._wantFinalResult).to.equal true
+      @w3hear.start()
+

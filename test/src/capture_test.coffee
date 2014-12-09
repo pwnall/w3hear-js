@@ -43,25 +43,29 @@ describe 'Capture', ->
         rightData[i] = @right[i]
       @source = @context.createBufferSource()
       @source.buffer = @buffer
-      @source.loop = false
+      @source.loop = true
       if @useMediaStream
         @destination = @context.createMediaStreamDestination()
         @source.connect @destination
         @stream = @destination.stream
+        @oldContextCreateMediaStreamSource = null
       else
         @destination = null
         @stream = { _source: @source }
+        @oldContextCreateMediaStreamSource = @context.createMediaStreamSource
         @context.createMediaStreamSource = (stream) =>
           expect(stream).to.equal @stream
           expect(stream._source).to.equal @source
           return stream._source
 
     afterEach ->
+      if @oldContextCreateMediaStreamSource isnt null
+        @context.createMediaStreamSource = @oldContextCreateMediaStreamSource
       # NOTE: this makes sure the capture stops, even if the test fails
-      @capture.stop()
       @source.stop()
       if @destination
         @source.disconnect()
+      @capture.release()
 
     it 'calls onSample correctly', (done) ->
       # NOTE: we use the fact that the first sample is non-zero to sync

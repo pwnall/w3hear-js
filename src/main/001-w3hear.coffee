@@ -19,7 +19,7 @@ class W3hear
     #       need to worry about posting useless messages to the Web Worker
     @_capture.onSamples = @_proxy.sendSamples.bind(@_proxy)
     @_started = false
-    @_oneLastResult = false
+    @_wantFinalResult = false
 
   # Start processing microphone input.
   #
@@ -43,7 +43,10 @@ class W3hear
   # @return undefined
   stop: ->
     return if @_started is false
+    @_started = false
+    @_wantFinalResult = true
     @_capture.stop()
+    @_proxy.requestResult()
     return
 
   # Asks the user for microphone access permission.
@@ -88,8 +91,8 @@ class W3hear
   # @return undefined
   _onWorkerResult: (results) ->
     if @_started is false
-      if @_oneLastResult
-        @_oneLastResult = false
+      if @_wantFinalResult and results.length > 0 and results[0].isFinal
+        @_wantFinalResult = false
       else
         return
     if @onresult isnt null

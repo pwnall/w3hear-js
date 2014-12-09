@@ -140,9 +140,12 @@ namespace pocketsphinxjs {
  *********************************************/
 
 // Vector bindings that give us access to resize.
+//
+// TODO(pwnall): remove this if/when the Emscripten PR gets accepted
+//     https://github.com/kripken/emscripten/pull/3062
 namespace emscripten {
     template<typename T>
-    class_<std::vector<T>> register_vector2(const char* name) {
+    class_<std::vector<T>> register_vector_with_resize(const char* name) {
         typedef std::vector<T> VecType;
 
         void (VecType::*push_back)(const T&) = &VecType::push_back;
@@ -187,7 +190,7 @@ EMSCRIPTEN_BINDINGS(recognizer) {
     .field("word", &ps::Transition::word);
 
 
-  emscripten::register_vector2<int16_t>("AudioBuffer");
+  emscripten::register_vector_with_resize<int16_t>("AudioBuffer");
   emscripten::register_vector<ps::Transition>("VectorTransitions");
   emscripten::register_vector<ps::Word>("VectorWords");
   emscripten::register_vector<ps::ConfigItem>("Config");
