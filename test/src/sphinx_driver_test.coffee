@@ -77,7 +77,9 @@ describe 'Worker.SphinxDriver', ->
           e = Math.floor(e) if typeof e is 'number'
           @_data[i] = e
         size: -> @_length
-        resize: (s) -> @_data.splice s
+        resize: (s, e) ->
+          expect(e).to.equal 0
+          @_data.splice s
         delete: ->
           @_deleted = true
           @_data = null  # Catch use-after-delete.

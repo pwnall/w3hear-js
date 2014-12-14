@@ -22,3 +22,9 @@
 [submodule "third_party/sphinxtrain"]
 	path = third_party/sphinxtrain
 	url = https://github.com/cmusphinx/sphinxtrain.git
+[submodule "third_party/julius"]
+	path = third_party/julius
+	url = https://github.com/pwnall/julius4.git
+[submodule "third_party/juliusjs"]
+	path = third_party/juliusjs
+	url = https://github.com/zzmp/juliusjs.git

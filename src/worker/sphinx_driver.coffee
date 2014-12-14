@@ -125,7 +125,7 @@ class W3hearWorker.SphinxDriver extends W3hearWorker.Driver
             usePush = true
 
     if usePush is false and j < bufferSize
-      @_buffer.resize j
+      @_buffer.resize j, 0
     return
 
   # @see {W3hearWorker.Driver#modelDataFile}

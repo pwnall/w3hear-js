@@ -84,7 +84,7 @@ describe 'lib/sphinx/pocketsphinx.js', ->
         @buffer.push_back 42
 
       it 'shrinks the vector', ->
-        @buffer.resize 300
+        @buffer.resize 300, 0
         expect(@buffer.size()).to.equal 300
         for i in [0...150]
           expect(@buffer.get(i * 2)).to.equal i * 100
@@ -92,7 +92,7 @@ describe 'lib/sphinx/pocketsphinx.js', ->
         expect(@buffer.get(300)).to.equal undefined
 
       it 'grows the vector', ->
-        @buffer.resize 620
+        @buffer.resize 620, 0
         expect(@buffer.size()).to.equal 620
         for i in [0...300]
           expect(@buffer.get(i * 2)).to.equal i * 100
